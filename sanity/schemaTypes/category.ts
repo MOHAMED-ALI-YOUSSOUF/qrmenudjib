@@ -35,6 +35,12 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+        name: "image",
+        title: "Image",
+        type: "image",
+        options: { hotspot: true },
+      }),
+    defineField({
       name: "order",
       title: "Ordre d'affichage",
       type: "number",
