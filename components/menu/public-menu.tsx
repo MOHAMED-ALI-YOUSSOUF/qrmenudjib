@@ -375,7 +375,7 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
       </div>
 
       {/* 🥘 Plats */}
-      <div className="px-6 py-6 space-y-12">
+      <div className="px-2 py-6 space-y-12">
         {filteredCategories.map(cat => (
           <div key={cat._id} data-category-id={cat._id} className="space-y-6">
             <CategoryHeader category={cat} color={colors.primary} />
