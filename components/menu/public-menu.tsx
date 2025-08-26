@@ -65,7 +65,7 @@ const DishCard: React.FC<{ dish: Dish; color: string }> = ({ dish, color }) => (
         </div>
       )}
     </div>
-    <div className="p-4 md:p-6 flex items-center gap-3">
+    <div className="p-4 md:p-6 flex flex-col sm:flex-row items-center gap-3">
       <h4 className="flex-1 text-lg md:text-xl text-gray-800 font-medium truncate">
         {dish.name}
       </h4>
@@ -79,7 +79,7 @@ const DishCard: React.FC<{ dish: Dish; color: string }> = ({ dish, color }) => (
 /** --- Category Header --- */
 const CategoryHeader: React.FC<{ category: Category; color: string }> = ({ category, color }) => (
   <div className="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm">
-    <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm bg-gray-100 flex-shrink-0">
+    <div className="sm:w-16 w-12 sm:h-16 h-12 rounded-2xl overflow-hidden shadow-sm bg-gray-100 flex-shrink-0">
       {category.image ? (
         <Image
           src={urlFor(category.image).url()}
@@ -95,7 +95,7 @@ const CategoryHeader: React.FC<{ category: Category; color: string }> = ({ categ
       )}
     </div>
     <div className="flex-1 flex justify-between items-center">
-      <h3 className="text-2xl font-bold text-gray-800">{category.name}</h3>
+      <h3 className="sm:text-2xl font-bold text-gray-800">{category.name}</h3>
       <span className="text-sm md:text-base text-white px-3 py-1 rounded-full" style={{ backgroundColor: color }}>
         {category.dishes.length} plats
       </span>
@@ -186,7 +186,7 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
   };
 
   return (
-    <div className="min-h-screen container mx-auto" style={{ fontFamily: restaurant.fontFamily || 'system-ui' }}>
+    <div className="min-h-screen sm:container mx-auto" style={{ fontFamily: restaurant.fontFamily || 'system-ui' }}>
 
       {/* Header avec image de couverture et logo */}
       <div className="relative h-[60vh] bg-black overflow-hidden">
@@ -329,18 +329,18 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
 
       {/* 🟠 Barre catégories */}
       <div className="sticky top-0 z-40 bg-white shadow-md">
-        <div className="flex items-center justify-between p-4">
-          <h2 className="text-lg md:text-xl font-bold">Catégories</h2>
+        <div className="flex items-center justify-between px-4 pt-2">
+          <h2 className="text-base md:text-xl font-bold">Catégories</h2>
           <div className="flex gap-2">
             <button onClick={() => scrollCategories('left')} className="p-2 rounded-full bg-gray-50 hover:bg-gray-100">
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-3 h-3" />
             </button>
             <button onClick={() => scrollCategories('right')} className="p-2 rounded-full bg-gray-50 hover:bg-gray-100">
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
         </div>
-        <div ref={categoryScrollerRef} className="flex gap-6 overflow-x-auto p-4 scrollbar-hide">
+        <div ref={categoryScrollerRef} className="flex gap-6 overflow-x-auto p-4 scrollbar-hide  ">
           {restaurant.categories.map(cat => (
             <button
               key={cat._id}
@@ -356,7 +356,7 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
           transform: selectedCategory === cat._id ? "scale(1.05)" : "scale(1)",
         }}
             >
-              <div className="w-16 h-16 rounded-full overflow-hidden mb-2 shadow-md">
+              <div className="w-10 h-10 sm:16 sm:h-16 rounded-full overflow-hidden mb-2 shadow-md">
                 {cat.image ? (
                  <Image src={urlFor(cat.image).url()} alt={cat.name} width={100} height={100} className="object-cover w-full h-full" />
                 ) : (
