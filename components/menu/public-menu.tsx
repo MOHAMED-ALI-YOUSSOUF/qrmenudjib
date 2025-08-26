@@ -356,7 +356,7 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
           transform: selectedCategory === cat._id ? "scale(1.05)" : "scale(1)",
         }}
             >
-              <div className="w-10 h-10 sm:16 sm:h-16 rounded-full overflow-hidden mb-2 shadow-md">
+              <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full overflow-hidden mb-2 shadow-md">
                 {cat.image ? (
                  <Image src={urlFor(cat.image).url()} alt={cat.name} width={100} height={100} className="object-cover w-full h-full" />
                 ) : (
