@@ -1,101 +1,184 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
-import { motion } from 'framer-motion';
+import { useSession, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { 
-  Sun, 
-  Moon, 
   Bell, 
-  HelpCircle,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import { signIn, signOut, useSession } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Sidebar } from '@/components/dashboard/sidebar';
+  Search, 
+  User, 
+  LogOut, 
+  Settings,
+  Moon,
+  Sun,
+  Menu,
+  X
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState } from "react";
+import Link from "next/link";
 
+interface DashboardHeaderProps {
+  onMobileMenuToggle?: () => void;
+  isMobileMenuOpen?: boolean;
+}
 
-export default function DashboardHeader() {
+export function DashboardHeader({ onMobileMenuToggle, isMobileMenuOpen }: DashboardHeaderProps) {
+  const { data: session, status } = useSession();
   const { theme, setTheme } = useTheme();
-  const { data: session } = useSession();
-  const [mounted, setMounted] = useState(false);
+  const [notifications] = useState(3);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const handleSignOut = async () => {
+    try {
+      await signOut({ callbackUrl: "/auth/signin" });
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+    }
+  };
 
-  if (!mounted) return null;
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  if (status === "loading") {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60">
+        <div className="flex h-16 items-center justify-between px-4 lg:px-6">
+          <div className="flex items-center space-x-4">
+            <Skeleton className="h-9 w-9 md:hidden" />
+            <div className="hidden md:flex items-center space-x-2">
+              <Skeleton className="h-5 w-5" />
+              <Skeleton className="h-9 w-64" />
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-9 w-9" />
+            <Skeleton className="h-9 w-9" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
-    <motion.header 
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="h-16 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40"
-    >
-      <div className="h-full px-6 flex items-center justify-end space-x-3">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60">
+      <div className="flex h-16 items-center justify-between px-4 lg:px-6">
+        {/* Left side */}
+        <div className="flex items-center space-x-4">
+          {/* Mobile menu button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onMobileMenuToggle}
+            className="md:hidden"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+          
+         
+        </div>
 
-        {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+        {/* Right side */}
+        <div className="flex items-center space-x-2">
+          {/* Theme toggle */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={toggleTheme}
+            className="h-9 w-9"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+            <span className="sr-only">Toggle theme</span>
+          </Button>
 
-        {/* Notifications */}
-        {/* <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 relative"
-        >
-          <Bell className="h-5 w-5" />
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500">
-            3
-          </Badge>
-        </Button> */}
+          {/* Notifications */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="relative h-9 w-9"
+          >
+            <Bell className="h-4 w-4" />
+            {notifications > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 min-w-5"
+              >
+                {notifications > 9 ? '9+' : notifications}
+              </Badge>
+            )}
+            <span className="sr-only">Notifications</span>
+          </Button>
 
-        {/* Help */}
-        {/* <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <HelpCircle className="h-5 w-5" />
-        </Button> */}
-
-        {/* User Menu */}
-        {session ? (
-          <div className="flex items-center space-x-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={session.user?.image || ''} />
-              <AvatarFallback>{session.user?.name?.charAt(0) || "?"}</AvatarFallback>
-            </Avatar>
-            <Button
-              variant="outline"
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="rounded-xl"
-            >
-              Déconnexion
-            </Button>
-          </div>
-        ) : (
-          <Link href="/auth/signin">
-            <Button 
-              variant="outline" 
-              className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-gray-800 rounded-xl"
-            >
-              Connexion
-            </Button>
-          </Link>
-        )}
+          {/* User menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={session?.user?.image || undefined} />
+                  <AvatarFallback className="bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400">
+                    {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {session?.user?.name || 'Utilisateur'}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {session?.user?.email || 'email@example.com'}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/dashboard/settings" className="flex w-full">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Paramètres</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={handleSignOut}
+                className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/50 cursor-pointer"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Se déconnecter</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </motion.header>
+
+      
+    </header>
   );
 }

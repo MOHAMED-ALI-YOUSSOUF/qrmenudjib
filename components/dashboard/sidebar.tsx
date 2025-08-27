@@ -1,157 +1,185 @@
-// components/dashboard/sidebar.tsx - Sidebar component
 'use client';
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { useSession, signOut } from "next-auth/react";
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { 
   Home, 
   BookOpen, 
   UtensilsCrossed, 
   QrCode, 
-  Settings, 
-  LogOut, 
+  Settings,
+  ChefHat,
   ChevronLeft,
-  User
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { signOut } from 'next-auth/react';
 
-export function Sidebar({ children }: { children: React.ReactNode }) {
+const routes = [
+  { label: 'Tableau de bord', icon: Home, href: '/dashboard' },
+  { label: 'Categories', icon: BookOpen, href: '/dashboard/categories' },
+  { label: 'Mes Plats', icon: UtensilsCrossed, href: '/dashboard/plats' },
+  { label: 'Générer QR Code', icon: QrCode, href: '/dashboard/qrcode' },
+  { label: 'Paramètres', icon: Settings, href: '/dashboard/settings' },
+];
+
+interface SidebarProps {
+  className?: string;
+}
+
+export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const routes = [
-    { label: 'Tableau de bord', icon: Home, href: '/dashboard', active: pathname === '/dashboard' },
-    { label: 'Mes Menus', icon: BookOpen, href: '/dashboard/menus', active: pathname === '/dashboard/menus' },
-    { label: 'Ajouter un Plat', icon: UtensilsCrossed, href: '/dashboard/plats', active: pathname === '/dashboard/plats' },
-    { label: 'Générer QR Code', icon: QrCode, href: '/dashboard/qrcode', active: pathname === '/dashboard/qrcode' },
-    { label: 'Paramètres', icon: Settings, href: '/dashboard/settings', active: pathname === '/dashboard/settings' },
-  ];
+  // Fermer sidebar automatiquement quand le pathname change (sur petit écran)
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsCollapsed(true);
+    }
+  }, [pathname]);
 
-  const sidebarVariants = { expanded: { width: 280 }, collapsed: { width: 80 } };
-  const contentVariants = { expanded: { paddingLeft: 280 }, collapsed: { paddingLeft: 80 } };
+  // Sur resize → collapse si petit écran
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsCollapsed(true);
+      }
+    };
+    handleResize(); // init au montage
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex">
-        <aside className="w-64 bg-white/90 backdrop-blur-xl shadow-lg p-6 space-y-6">
-          <Skeleton className="h-10 w-40 rounded-md" />
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full rounded-lg" />
-            ))}
-          </div>
-          <Skeleton className="h-10 w-full rounded-lg" />
-        </aside>
-        <main className="flex-1 p-6 space-y-4">
-          <Skeleton className="h-10 w-1/3 rounded-lg" />
-          <Skeleton className="h-6 w-1/4 rounded-lg" />
-          <div className="grid grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-xl" />
-            ))}
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-8 text-center max-w-md"
-        >
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">Accès Restreint</h2>
-          <p className="text-gray-600 mb-6">
-            Connectez-vous pour accéder à votre tableau de bord
-          </p>
-          <Button
-            className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl h-12 font-medium"
-            onClick={() => window.location.href = '/auth/signin'}
-          >
-            Se connecter
-          </Button>
-        </motion.div>
-      </div>
-    );
-  }
+  const handleSignOut = async () => {
+    try {
+      await signOut({ callbackUrl: "/auth/signin" });
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex">
-      <motion.aside
-        variants={sidebarVariants}
-        animate={isCollapsed ? 'collapsed' : 'expanded'}
-        transition={{ duration: 0.3 }}
-        className="fixed left-0 top-0 h-full bg-white/90 backdrop-blur-xl shadow-lg border-r border-white/20 z-50"
+    <TooltipProvider>
+      <div
+        className={cn(
+          "flex flex-col h-full bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
+          isCollapsed ? "w-16" : "w-64",
+          className
+        )}
       >
-        <div className="p-4 border-b border-gray-100/50 flex items-center justify-between">
-          {!isCollapsed && <h1 className="text-xl font-bold">QR Menu DJ</h1>}
+        {/* Header / Logo */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <div
+            className={cn(
+              "flex items-center transition-opacity duration-300",
+              isCollapsed && "opacity-0 w-0 overflow-hidden"
+            )}
+          >
+            <ChefHat className="h-8 w-8 text-orange-500" />
+            <h2 className="ml-3 text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+              QRMenuDJ
+            </h2>
+          </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 hidden md:flex"
           >
-            <motion.div animate={{ rotate: isCollapsed ? 180 : 0 }}>
+            {isCollapsed ? (
+            
+              <ChevronRight className="h-4 w-4" />
+            ) : (
               <ChevronLeft className="h-4 w-4" />
-            </motion.div>
+            )}
           </Button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
-          {routes.map((route) => {
-            const Icon = route.icon;
-            return (
-              <Link
-                key={route.href}
-                href={route.href}
-                className={cn(
-                  "flex items-center p-3 rounded-xl text-sm font-medium transition-all",
-                  route.active
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md"
-                    : "text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
-                )}
-              >
-                <Icon className={cn("h-5 w-5", isCollapsed ? "mx-auto" : "mr-3")} />
-                {!isCollapsed && route.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Navigation */}
+        <ScrollArea className="flex-1 px-3 py-4">
+          <nav className="space-y-1">
+            {routes.map(({ label, icon: Icon, href }) => {
+              const isActive = pathname === href;
+              const button = (
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full h-11 text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800",
+                    isActive &&
+                      "bg-orange-50 text-orange-700 hover:bg-orange-50 hover:text-orange-700 dark:bg-orange-950 dark:text-orange-400 dark:hover:bg-orange-950",
+                    isCollapsed ? "justify-center px-2" : "justify-start px-3"
+                  )}
+                >
+                  <Icon
+                    className={cn("h-5 w-5 flex-shrink-0", !isCollapsed && "mr-3")}
+                  />
+                  {!isCollapsed && (
+                    <span className="truncate transition-all duration-300">
+                      {label}
+                    </span>
+                  )}
+                </Button>
+              );
 
-        <div className="p-4 border-t border-gray-100/50">
-          <button 
-            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-            className="flex items-center p-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 w-full transition-all"
-          >
-            <LogOut className={cn("h-5 w-5", isCollapsed ? "mx-auto" : "mr-3")} />
-            {!isCollapsed && "Déconnexion"}
-          </button>
-        </div>
-      </motion.aside>
+              return isCollapsed ? (
+                <Tooltip key={href}>
+                  <TooltipTrigger asChild>
+                    <Link href={href}>{button}</Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="font-medium">
+                    {label}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Link key={href} href={href}>
+                  {button}
+                </Link>
+              );
+            })}
+          </nav>
+        </ScrollArea>
 
-      <motion.main
-        variants={contentVariants}
-        animate={isCollapsed ? 'collapsed' : 'expanded'}
-        transition={{ duration: 0.3 }}
-        className="flex-1 min-h-screen p-6"
-      >
-        <div className="max-w-7xl mx-auto">
-          {children}
+        {/* Footer */}
+        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800">
+          {isCollapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                  className="flex items-center justify-center w-full transition-all duration-300"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="font-medium">
+                Se déconnecter
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={handleSignOut}
+              className="flex items-center justify-start w-full transition-all duration-300"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                Se déconnecter
+              </span>
+            </Button>
+          )}
         </div>
-      </motion.main>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

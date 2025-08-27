@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { urlFor } from '@/sanity/lib/image';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 interface Restaurant {
   _id: string;
@@ -202,10 +203,6 @@ export default function QRCodePage() {
     }
   };
 
-  // Get image URL for preview
-  const getImageUrl = (image: any) => {
-    return image ? urlFor(image).url() : null;
-  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -243,10 +240,11 @@ export default function QRCodePage() {
                   imageSettings={
                     qrData.logo
                       ? {
-                          src: getImageUrl(qrData.logo) || '',
+                          src: urlFor(qrData.logo).url() || '',
                           height: qrData.logoSize,
                           width: qrData.logoSize,
                           excavate: true,
+                          
                         }
                       : undefined
                   }
@@ -324,10 +322,11 @@ export default function QRCodePage() {
                 {qrData.logo ? (
                   <div className="space-y-3">
                     <div className="relative h-32 w-32 mx-auto overflow-hidden rounded-lg border">
-                      <img
-                        src={getImageUrl(qrData.logo) || ''}
+                      <Image
+                        src={urlFor(qrData.logo).url() || ''}
                         alt="Logo preview"
-                        className="w-full h-full object-contain"
+                        fill
+                        className="w-full h-full object-cover"
                       />
                       <Button
                         variant="destructive"
@@ -440,7 +439,7 @@ export default function QRCodePage() {
                 <h3 className="font-semibold mb-2">💡 Conseils</h3>
                 <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-400">
                   <li>• Utilisez un contraste élevé pour une meilleure lisibilité</li>
-                  <li>• Testez votre QR Code avant l'impression</li>
+                  <li>• Testez votre QR Code avant l&opos;impression</li>
                   <li>• Taille recommandée : 256px minimum</li>
                   <li>• Ajoutez un logo centré pour une touche personnalisée</li>
                 </ul>

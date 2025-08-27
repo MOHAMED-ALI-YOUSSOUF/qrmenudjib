@@ -32,6 +32,8 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import Image from 'next/image';
+import { urlFor } from '@/sanity/lib/image';
 
 interface Dish {
   _id: string;
@@ -59,20 +61,7 @@ interface Category {
   name: string;
 }
 
-const ALLERGENS = [
-  { title: 'Gluten', value: 'gluten' },
-  { title: 'Œufs', value: 'eggs' },
-  { title: 'Lait', value: 'milk' },
-  { title: 'Fruits à coque', value: 'nuts' },
-  { title: 'Poisson', value: 'fish' },
-  { title: 'Crustacés', value: 'shellfish' },
-  { title: 'Soja', value: 'soy' },
-  { title: 'Céleri', value: 'celery' },
-  { title: 'Moutarde', value: 'mustard' },
-  { title: 'Sésame', value: 'sesame' },
-  { title: 'Sulfites', value: 'sulfites' },
-  { title: 'Lupin', value: 'lupin' },
-];
+
 
 export default function DishesPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
@@ -90,7 +79,6 @@ export default function DishesPage() {
     price: '',
     menuId: '',
     categoryId: '',
-    allergens: [] as string[],
     isAvailable: true,
     isPopular: false,
   });
@@ -292,13 +280,13 @@ export default function DishesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm: justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mes Plats</h1>
           <p className="text-gray-600 mt-1">
-            Gérez vos plats et organisez-les par menus et catégories
+            Gérez vos plats et organisez-les par  catégories
           </p>
         </div>
         <button
@@ -310,7 +298,6 @@ export default function DishesPage() {
               price: '',
               menuId: '',
               categoryId: '',
-              allergens: [],
               isAvailable: true,
               isPopular: false,
             });
@@ -401,31 +388,6 @@ export default function DishesPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Allergènes</label>
-                <div className="mt-1 grid grid-cols-2 gap-2">
-                  {ALLERGENS.map((allergen) => (
-                    <label key={allergen.value} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        value={allergen.value}
-                        checked={newDish.allergens.includes(allergen.value)}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setNewDish({
-                            ...newDish,
-                            allergens: e.target.checked
-                              ? [...newDish.allergens, value]
-                              : newDish.allergens.filter((a) => a !== value),
-                          });
-                        }}
-                        className="mr-2"
-                      />
-                      {allergen.title}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
                 <label className="flex items-center text-sm font-medium text-gray-700">
                   <input
                     type="checkbox"
@@ -472,7 +434,7 @@ export default function DishesPage() {
       )}
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-co sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
@@ -545,10 +507,8 @@ export default function DishesPage() {
       <TableRow>
         <TableHead>Nom</TableHead>
         <TableHead>Description</TableHead>
-        <TableHead>Prix (€)</TableHead>
-        <TableHead>Menu</TableHead>
+        <TableHead>Prix (fdj)</TableHead>
         <TableHead>Catégorie</TableHead>
-        <TableHead>Allergènes</TableHead>
         <TableHead>Statut</TableHead>
         <TableHead>Actions</TableHead>
       </TableRow>
@@ -563,14 +523,23 @@ export default function DishesPage() {
       ) : (
         filteredDishes.map((dish) => (
           <TableRow key={dish._id}>
-            <TableCell className="font-medium">{dish.name}</TableCell>
+            <TableCell className="font-medium ">
+                {dish.image && (
+                  <div>
+                  <Image
+                    src={urlFor(dish.image).url()}
+                    alt={dish.name}
+                    width={40}
+                    height={40}
+                    className="object-cover rounded mr-2 inline-block"
+                    />
+                    {dish.name}               
+                    </div>
+                )}
+                </TableCell>
             <TableCell>{dish.description || "-"}</TableCell>
-            <TableCell>{dish.price.toFixed(2)} €</TableCell>
-            <TableCell>{dish.menu?.name || "-"}</TableCell>
+            <TableCell>{dish.price} </TableCell>
             <TableCell>{dish.category.name}</TableCell>
-            <TableCell>
-              {dish.allergens.length > 0 ? dish.allergens.join(", ") : "-"}
-            </TableCell>
             <TableCell>
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAvailabilityColor(
@@ -588,12 +557,7 @@ export default function DishesPage() {
                 >
                   <Edit className="h-4 w-4" />
                 </button>
-                <a
-                  href={`/dish/${dish.slug.current}`}
-                  className="text-gray-500 hover:text-gray-600"
-                >
-                  <Eye className="h-4 w-4" />
-                </a>
+                
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <button className="text-red-500 hover:text-red-600">

@@ -44,6 +44,9 @@ export async function GET(req: NextRequest) {
         name,
         slug,
         description,
+        image,
+        order,
+        isActive,
         createdAt,
         updatedAt,
         "dishCount": count(*[_type == "dish" && category._ref == ^._id])
@@ -102,6 +105,9 @@ export async function POST(req: NextRequest) {
       name,
       slug: { current: slugify(name) },
       description: description || "",
+      image: null,  
+      order: 0,
+      isActive: true,
       restaurant: { _type: "reference", _ref: restaurantId },
     };
 

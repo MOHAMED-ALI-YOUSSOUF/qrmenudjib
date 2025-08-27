@@ -1,3 +1,4 @@
+// api/upload-image/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { writeClient as sanityClient } from '@/sanity/lib/write-client';
 import { getServerSession } from 'next-auth';

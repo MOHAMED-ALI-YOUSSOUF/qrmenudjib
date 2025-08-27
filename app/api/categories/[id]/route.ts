@@ -58,6 +58,9 @@ export async function PATCH(req: NextRequest) {
       name,
       slug: { current: slugify(name) },
       description: description || "",
+      image: body.image || null,  
+      order: body.order || 0,  
+      isActive: body.isActive !== undefined ? body.isActive : true,
     };
 
     const updatedCategory = await writeClient

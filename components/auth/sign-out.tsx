@@ -7,7 +7,7 @@ export function SignOut() {
   return (
     <Button
       variant="outline"
-      onClick={() => signOut({ callbackUrl: '/' })}
+      onClick={() => signOut({ callbackUrl: '/auth/signin' })}
     >
       Se déconnecter
     </Button>
