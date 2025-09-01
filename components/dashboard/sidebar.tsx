@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
+import { APP_NAME } from '@/lib/constants';
 
 const routes = [
   { label: 'Tableau de bord', icon: Home, href: '/dashboard' },
@@ -63,6 +64,7 @@ export function Sidebar({ className }: SidebarProps) {
   const handleSignOut = async () => {
     try {
       await signOut({ callbackUrl: "/auth/signin" });
+      
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
     }
@@ -87,14 +89,14 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <ChefHat className="h-8 w-8 text-orange-500" />
             <h2 className="ml-3 text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
-              QRMenuDJ
+              {APP_NAME}
             </h2>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 p-0 hidden md:flex"
+            className="h-8 w-8 p-0 hidden md:flex cursor-pointer"
           >
             {isCollapsed ? (
             
@@ -114,10 +116,10 @@ export function Sidebar({ className }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full h-11 text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800",
+                    "cursor-pointer w-full h-11 lg:h-12 text-sm lg:text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800  ",
                     isActive &&
                       "bg-orange-50 text-orange-700 hover:bg-orange-50 hover:text-orange-700 dark:bg-orange-950 dark:text-orange-400 dark:hover:bg-orange-950",
-                    isCollapsed ? "justify-center px-2" : "justify-start px-3"
+                    isCollapsed ? "justify-center px-2" : "justify-start px-3 lg:px-4"
                   )}
                 >
                   <Icon
@@ -136,7 +138,7 @@ export function Sidebar({ className }: SidebarProps) {
                   <TooltipTrigger asChild>
                     <Link href={href}>{button}</Link>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="font-medium">
+                  <TooltipContent side="right" className="font-medium ">
                     {label}
                   </TooltipContent>
                 </Tooltip>
@@ -150,14 +152,14 @@ export function Sidebar({ className }: SidebarProps) {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800">
+        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800 ">
           {isCollapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   onClick={handleSignOut}
-                  className="flex items-center justify-center w-full transition-all duration-300"
+                  className="flex items-center justify-center w-full transition-all duration-300 cursor-pointer"
                 >
                   <LogOut className="h-4 w-4" />
                 </Button>
@@ -170,7 +172,7 @@ export function Sidebar({ className }: SidebarProps) {
             <Button
               variant="ghost"
               onClick={handleSignOut}
-              className="flex items-center justify-start w-full transition-all duration-300"
+              className="flex items-center justify-start w-full transition-all duration-300 cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
               <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">

@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, description, price, menuId, categoryId, allergens, isAvailable, isPopular } = body;
+    const { name, description, price, image, categoryId,  isAvailable, isPopular } = body;
 
     if (!name || !categoryId || !price) {
       return NextResponse.json(
@@ -60,9 +60,7 @@ export async function PATCH(req: NextRequest) {
       description: description || "",
       price: parseFloat(price),
       category: { _type: "reference", _ref: categoryId },
-      ...(menuId && { menu: { _type: "reference", _ref: menuId } }),
-      ...(menuId === "" && { menu: null }),
-      allergens: allergens || [],
+      image,
       isAvailable: isAvailable ?? true,
       isPopular: isPopular ?? false,
     };

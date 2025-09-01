@@ -30,12 +30,6 @@ const features = [
     icon: <Edit className="h-8 w-8 text-purple-600" />,
   },
   {
-    id: 'multilingual',
-    title: 'Multilingue',
-    description: 'Proposez vos menus en plusieurs langues pour attirer plus de clients.',
-    icon: <Globe className="h-8 w-8 text-indigo-600" />,
-  },
-  {
     id: 'analytics',
     title: 'Statistiques',
     description: 'Suivez les vues de votre menu et optimisez votre offre.',

@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, description } = body;
+    const { name, description,categoryId, image, order, isActive } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -105,9 +105,10 @@ export async function POST(req: NextRequest) {
       name,
       slug: { current: slugify(name) },
       description: description || "",
-      image: null,  
-      order: 0,
-      isActive: true,
+      category: { _type: "reference", _ref: categoryId },
+      image: image || null,
+      order: typeof order === "number" ? order : 0,
+      isActive: typeof isActive === "boolean" ? isActive : true,
       restaurant: { _type: "reference", _ref: restaurantId },
     };
 

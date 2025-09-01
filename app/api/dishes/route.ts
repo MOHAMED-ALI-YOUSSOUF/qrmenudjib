@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, description, price, menuId, categoryId, allergens, isAvailable, isPopular } = body;
+    const { name, description, price, image, categoryId,  isAvailable, isPopular } = body;
 
     if (!name || !categoryId || !price) {
       return NextResponse.json(
@@ -112,8 +112,7 @@ export async function POST(req: NextRequest) {
       price: parseFloat(price),
       restaurant: { _type: "reference", _ref: restaurantId },
       category: { _type: "reference", _ref: categoryId },
-      ...(menuId && { menu: { _type: "reference", _ref: menuId } }),
-      allergens: allergens || [],
+      image,
       isAvailable: isAvailable ?? true,
       isPopular: isPopular ?? false,
     };

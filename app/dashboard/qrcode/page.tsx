@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { QRCodeCanvas } from 'qrcode.react';
-import { Download, Copy, Share2, Settings, Upload, X, Save, Lock } from 'lucide-react';
+import { Download, Copy, Share2, Settings, Save, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { urlFor } from '@/sanity/lib/image';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
+
+import { APP_LINK } from '@/lib/constants';
+
 
 interface Restaurant {
   _id: string;
@@ -46,6 +47,9 @@ export default function QRCodePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+
+
+
   // Fetch restaurant data and QR code settings
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +59,8 @@ export default function QRCodePage() {
           const restaurantQuery = `*[_type == "restaurant" && owner->email == $email][0] {
             _id,
             name,
-            slug
+            slug,
+            logo
           }`;
           const restaurantData = await sanityClient.fetch(restaurantQuery, { 
             email: session.user.email 
@@ -65,7 +70,7 @@ export default function QRCodePage() {
             setRestaurant(restaurantData);
             
             // Set default URL based on restaurant slug
-            const defaultUrl = `https://qrmenu.dj/${restaurantData.slug.current}`;
+            const defaultUrl = `https://${APP_LINK}.rohaty.com/${restaurantData.slug.current}`;
             
             // Try to fetch existing QR code settings
             try {
@@ -85,6 +90,7 @@ export default function QRCodePage() {
                 setQrData(prev => ({
                   ...prev,
                   url: defaultUrl,
+                  logo: restaurantData.logo || null,
                 }));
               }
             } catch (error) {
@@ -134,42 +140,42 @@ export default function QRCodePage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('L\'image ne doit pas dépasser 2MB');
-      return;
-    }
+  //   if (file.size > 2 * 1024 * 1024) {
+  //     toast.error('L\'image ne doit pas dépasser 2MB');
+  //     return;
+  //   }
 
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('file', file);
 
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
+  //     const response = await fetch('/api/upload-image', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
 
-      if (response.ok) {
-        const imageData = await response.json();
-        setQrData(prev => ({ ...prev, logo: imageData }));
-        toast.success('Logo téléchargé avec succès');
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.error || 'Erreur lors du téléchargement du logo');
-      }
-    } catch (error) {
-      console.error('Error uploading logo:', error);
-      toast.error('Erreur lors du téléchargement du logo');
-    }
-  };
+  //     if (response.ok) {
+  //       const imageData = await response.json();
+  //       setQrData(prev => ({ ...prev, logo: imageData }));
+  //       toast.success('Logo téléchargé avec succès');
+  //     } else {
+  //       const errorData = await response.json();
+  //       toast.error(errorData.error || 'Erreur lors du téléchargement du logo');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error uploading logo:', error);
+  //     toast.error('Erreur lors du téléchargement du logo');
+  //   }
+  // };
 
-  const handleRemoveImage = () => {
-    setQrData(prev => ({ ...prev, logo: null }));
-    toast.success('Logo supprimé');
-  };
+  // const handleRemoveImage = () => {
+  //   setQrData(prev => ({ ...prev, logo: null }));
+  //   toast.success('Logo supprimé');
+  // };
 
   const handleSave = async () => {
     if (!restaurant?._id) {
@@ -229,27 +235,28 @@ export default function QRCodePage() {
               <CardTitle>Aperçu du QR Code</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-6">
-              <div className="p-6 bg-white rounded-lg shadow-sm">
-                <QRCodeCanvas
-                  id="qr-code"
-                  value={qrData.url}
-                  size={qrData.size}
-                  bgColor={qrData.backgroundColor}
-                  fgColor={qrData.foregroundColor}
-                  includeMargin={true}
-                  imageSettings={
-                    qrData.logo
-                      ? {
-                          src: urlFor(qrData.logo).url() || '',
-                          height: qrData.logoSize,
-                          width: qrData.logoSize,
-                          excavate: true,
-                          
-                        }
-                      : undefined
-                  }
-                />
-              </div>
+              <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg text-center">
+              {/* QR Code */}
+              <QRCodeCanvas
+                id="qr-code"
+                value={qrData.url}
+                size={qrData.size}
+                bgColor={qrData.backgroundColor}
+                fgColor={qrData.foregroundColor}
+                includeMargin={true}
+              />
+
+              {/* Nom du restaurant */}
+              <h2 className="mt-4 text-xl font-bold text-gray-900">
+                {restaurant?.name || 'Mon Restaurant'}
+              </h2>
+
+              {/* Optionnel : slogan ou info */}
+              <p className="text-sm text-gray-600 mt-1">
+                Scannez-moi pour voir le menu !
+              </p>
+            </div>
+
               <div className="flex flex-wrap gap-2">
                 <Button onClick={downloadQR} className="flex items-center gap-2">
                   <Download className="w-4 h-4" />
@@ -317,55 +324,9 @@ export default function QRCodePage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="logo">Logo (optionnel)</Label>
-                {qrData.logo ? (
-                  <div className="space-y-3">
-                    <div className="relative h-32 w-32 mx-auto overflow-hidden rounded-lg border">
-                      <Image
-                        src={urlFor(qrData.logo).url() || ''}
-                        alt="Logo preview"
-                        fill
-                        className="w-full h-full object-cover"
-                      />
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="absolute top-1 right-1"
-                        onClick={handleRemoveImage}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <Label
-                      htmlFor="logoInput"
-                      className="flex items-center justify-center p-3 border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Changer le logo</span>
-                    </Label>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md">
-                    <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500 mb-3">Aucun logo</p>
-                    <Label
-                      htmlFor="logoInput"
-                      className="flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-md cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Choisir un logo</span>
-                    </Label>
-                  </div>
-                )}
-                <input
-                  id="logoInput"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-              </div>
+              
+
+
 
               <div className="space-y-2">
                 <Label htmlFor="size">Taille ({qrData.size}px)</Label>
@@ -380,18 +341,6 @@ export default function QRCodePage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="logoSize">Taille du logo ({qrData.logoSize}px)</Label>
-                <Input
-                  id="logoSize"
-                  type="range"
-                  min="20"
-                  max="100"
-                  value={qrData.logoSize}
-                  onChange={(e) => setQrData({ ...qrData, logoSize: parseInt(e.target.value) })}
-                  className="w-full"
-                />
-              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -441,7 +390,7 @@ export default function QRCodePage() {
                   <li>• Utilisez un contraste élevé pour une meilleure lisibilité</li>
                   <li>• Testez votre QR Code avant l&opos;impression</li>
                   <li>• Taille recommandée : 256px minimum</li>
-                  <li>• Ajoutez un logo centré pour une touche personnalisée</li>
+                 
                 </ul>
               </div>
             </CardContent>

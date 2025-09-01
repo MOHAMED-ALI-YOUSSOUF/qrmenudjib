@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Card, CardContent } from '../ui/card'
 import QRGenerator from '../shared/qr-generator'
-import { SignUpButton } from '@clerk/nextjs'
 import { Badge } from '../ui/badge'
 import { motion } from 'framer-motion'
 
@@ -31,17 +30,7 @@ export function Hero() {
                 La solution complète pour créer des menus numériques professionnels. 
                 Vos clients scannent, consultent et commandent en toute simplicité.
               </p>
-              {/* <div className="flex flex-col sm:flex-row gap-4">
-                <SignUpButton mode="modal">
-                  <Button size="lg" className="text-lg px-8">
-                    Créer mon menu gratuitement
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </SignUpButton>
-                <Button variant="outline" size="lg" className="text-lg px-8">
-                  Voir une démo
-                </Button>
-              </div> */}
+             
             </motion.div>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -58,13 +47,13 @@ export function Hero() {
         </div>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-          <Link href="/dashboard">
+          <Link href="/auth/sign-up">
             <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 transition-transform hover:scale-105">
               Essayer Gratuitement
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/albahar">
+          <Link href="/maki">
             <Button
               variant="outline"
               size="lg"
@@ -90,13 +79,13 @@ export function Hero() {
               Scannez pour découvrir notre menu
             </p>
             <QRGenerator
-              value="https://qrmenu.dj/albahar"
+              value="https://qrmenu.dj/maki"
               size={220}
               className="mb-6"
               logoUrl="/logo-albahar.png"
             />
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-              qrmenu.dj/albahar
+              qrmenu.dj/maki
             </p>
           </CardContent>
         </Card>

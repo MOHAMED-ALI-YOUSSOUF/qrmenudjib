@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { writeClient as sanityClient } from '@/sanity/lib/write-client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import slugify from 'slugify';
 
 export async function GET(request: Request) {
   try {
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
     const query = `*[_type == "restaurant" && owner->email == $email][0] {
       _id,
       name,
+      slug,
       description,
       whatsapp,
       primaryColor,
@@ -95,10 +97,12 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    
     // Parse request body
     const data = await request.json();
     const {
       name,
+      slug,
       description,
       whatsapp,
       adresse,
@@ -131,9 +135,15 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 });
     }
 
+    // Générer automatiquement le slug
+    const generatedSlug = slug
+      ? slugify(slug, { lower: true, strict: true })
+      : slugify(name, { lower: true, strict: true });
+
     // Prepare update data, converting null to undefined for image fields
     const updateData = {
       name,
+      slug: { _type: "slug", current: generatedSlug },
       description,
       whatsapp,
       adresse,

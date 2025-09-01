@@ -1,56 +1,54 @@
-'use client';
+'use client'
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import {
-  Search, ChevronLeft, ChevronRight, MapPin,
-  Instagram, Facebook, MessageCircle, ArrowUp, Phone
-} from 'lucide-react';
-import { urlFor } from '@/sanity/lib/image';
+import React, { useState, useMemo, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Search, ChevronLeft, ChevronRight, MapPin, Instagram, Facebook, MessageCircle, ArrowUp, Phone } from 'lucide-react'
+import { urlFor } from '@/sanity/lib/image'
+import { ThemeToggle } from '../theme-toggle'
 
 interface Dish {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  image?: any;
+  _id: string
+  name: string
+  description: string
+  price: number
+  image?: any
 }
 
 interface Category {
-  _id: string;
-  name: string;
-  slug: any;
-  image?: any;
-  dishes: Dish[];
+  _id: string
+  name: string
+  slug: any
+  image?: any
+  dishes: Dish[]
 }
 
 interface Restaurant {
-  _id: string;
-  name: string;
-  slug: any;
-  logo?: any;
-  coverImage?: any;
-  whatsapp?: string;
-  instagram?: string;
-  facebook?: string;
-  tiktok?: string;
-  phone?: string;
-  adresse?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  accentColor?: string;
-  fontFamily?: string;
-  categories: Category[];
+  _id: string
+  name: string
+  slug: any
+  logo?: any
+  coverImage?: any
+  whatsapp?: string
+  instagram?: string
+  facebook?: string
+  tiktok?: string
+  phone?: string
+  adresse?: string
+  primaryColor?: string
+  secondaryColor?: string
+  accentColor?: string
+  fontFamily?: string
+  categories: Category[]
 }
 
 interface RestaurantPageProps {
-  restaurant: Restaurant;
+  restaurant: Restaurant
 }
 
 /** --- Dish Card --- */
 const DishCard: React.FC<{ dish: Dish; color: string }> = ({ dish, color }) => (
-  <div className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition">
+  <div className="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition border border-gray-200 dark:border-gray-700">
     <div className="relative h-48 md:h-56">
       {dish.image ? (
         <Image
@@ -66,7 +64,7 @@ const DishCard: React.FC<{ dish: Dish; color: string }> = ({ dish, color }) => (
       )}
     </div>
     <div className="p-4 md:p-6 flex flex-col sm:flex-row items-center gap-3">
-      <h4 className="flex-1 text-lg md:text-xl text-gray-800 font-medium truncate">
+      <h4 className="flex-1 text-lg md:text-xl text-gray-800 dark:text-white font-medium truncate">
         {dish.name}
       </h4>
       <div className="text-sm md:text-base font-bold text-white rounded-xl py-2 px-4 shrink-0" style={{ backgroundColor: color }}>
@@ -74,12 +72,12 @@ const DishCard: React.FC<{ dish: Dish; color: string }> = ({ dish, color }) => (
       </div>
     </div>
   </div>
-);
+)
 
 /** --- Category Header --- */
 const CategoryHeader: React.FC<{ category: Category; color: string }> = ({ category, color }) => (
-  <div className="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm">
-    <div className="sm:w-16 w-12 sm:h-16 h-12 rounded-2xl overflow-hidden shadow-sm bg-gray-100 flex-shrink-0">
+  <div className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="sm:w-16 w-12 sm:h-16 h-12 rounded-2xl overflow-hidden shadow-sm bg-gray-100 dark:bg-gray-700 flex-shrink-0">
       {category.image ? (
         <Image
           src={urlFor(category.image).url()}
@@ -95,27 +93,27 @@ const CategoryHeader: React.FC<{ category: Category; color: string }> = ({ categ
       )}
     </div>
     <div className="flex-1 flex justify-between items-center">
-      <h3 className="sm:text-2xl font-bold text-gray-800">{category.name}</h3>
+      <h3 className="sm:text-2xl font-bold text-gray-800 dark:text-white">{category.name}</h3>
       <span className="text-sm md:text-base text-white px-3 py-1 rounded-full" style={{ backgroundColor: color }}>
         {category.dishes.length} plats
       </span>
     </div>
   </div>
-);
+)
 
 /** --- MAIN PAGE --- */
 export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>(restaurant.categories[0]?._id || '');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const categoryScrollerRef = useRef<HTMLDivElement | null>(null);
-  const isScrolling = useRef(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>(restaurant.categories[0]?._id || '')
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+  const categoryScrollerRef = useRef<HTMLDivElement | null>(null)
+  const isScrolling = useRef(false)
 
   const colors = useMemo(() => ({
     primary: restaurant.primaryColor || '#f97316',
     secondary: restaurant.secondaryColor || '#1e3a8a',
-    accent: restaurant.accentColor || '#fbbf24'
-  }), [restaurant]);
+    accent: restaurant.accentColor || '#fbbf24',
+  }), [restaurant])
 
   const filteredCategories = useMemo(() => {
     return restaurant.categories
@@ -124,74 +122,94 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
         dishes: category.dishes.filter(dish =>
           dish.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           dish.description?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        ),
       }))
-      .filter(category => category.dishes.length > 0);
-  }, [searchTerm, restaurant.categories]);
+      .filter(category => category.dishes.length > 0)
+  }, [searchTerm, restaurant.categories])
 
-  /** Scroll synchronisation */
+  /** Scroll synchronization */
   const scrollToCategoryInBar = (categoryId: string) => {
-    const element = categoryRefs.current[categoryId];
-    const scroller = categoryScrollerRef.current;
+    const element = categoryRefs.current[categoryId]
+    const scroller = categoryScrollerRef.current
     if (element && scroller) {
-      const elementLeft = element.offsetLeft;
-      const elementWidth = element.offsetWidth;
-      const scrollerWidth = scroller.offsetWidth;
+      const elementLeft = element.offsetLeft
+      const elementWidth = element.offsetWidth
+      const scrollerWidth = scroller.offsetWidth
       scroller.scrollTo({
         left: elementLeft - scrollerWidth / 2 + elementWidth / 2,
         behavior: 'smooth',
-      });
+      })
     }
-  };
+  }
 
   const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    const element = document.querySelector(`[data-category-id="${categoryId}"]`);
+    setSelectedCategory(categoryId)
+    const element = document.querySelector(`[data-category-id="${categoryId}"]`)
     if (element) {
-      isScrolling.current = true;
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => { isScrolling.current = false; }, 1000);
+      isScrolling.current = true
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTimeout(() => { isScrolling.current = false }, 1000)
     }
-  };
+  }
 
-  /** Observer pour détecter la catégorie visible */
+  /** Observer to detect visible category */
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    const observer = new IntersectionObserver((entries) => {
-      if (isScrolling.current) return;
-      const visible = entries.find(e => e.isIntersecting && e.intersectionRatio > 0.5);
-      if (visible) {
-        const id = visible.target.getAttribute('data-category-id');
-        if (id) {
-          setSelectedCategory(id);
-          scrollToCategoryInBar(id);
+    const observers: IntersectionObserver[] = []
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isScrolling.current) return
+        const visible = entries.find(e => e.isIntersecting && e.intersectionRatio > 0.5)
+        if (visible) {
+          const id = visible.target.getAttribute('data-category-id')
+          if (id) {
+            setSelectedCategory(id)
+            scrollToCategoryInBar(id)
+          }
         }
-      }
-    }, { threshold: 0.5 });
+      },
+      { threshold: 0.5 }
+    )
 
     filteredCategories.forEach(cat => {
-      const el = document.querySelector(`[data-category-id="${cat._id}"]`);
-      if (el) observer.observe(el);
-    });
+      const el = document.querySelector(`[data-category-id="${cat._id}"]`)
+      if (el) observer.observe(el)
+    })
 
-    return () => observer.disconnect();
-  }, [filteredCategories]);
+    return () => observer.disconnect()
+  }, [filteredCategories])
 
-  /** Défilement horizontal catégories */
+  /** Track page view */
+  useEffect(() => {
+    async function trackView() {
+      try {
+        await fetch('/api/track/view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            restaurantId: restaurant._id,
+            device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+          }),
+        })
+      } catch (e) {
+        console.error('Track view failed', e)
+      }
+    }
+    trackView()
+  }, [restaurant._id])
+
+  /** Scroll categories horizontally */
   const scrollCategories = (dir: 'left' | 'right') => {
     if (categoryScrollerRef.current) {
-      const scrollAmount = categoryScrollerRef.current.offsetWidth / 2;
-      categoryScrollerRef.current.scrollBy({ left: dir === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+      const scrollAmount = categoryScrollerRef.current.offsetWidth / 2
+      categoryScrollerRef.current.scrollBy({ left: dir === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen sm:container mx-auto" style={{ fontFamily: restaurant.fontFamily || 'system-ui' }}>
-
-      {/* Header avec image de couverture et logo */}
+    <div className="min-h-screen sm:container mx-auto bg-gray-50 dark:bg-gray-900" style={{ fontFamily: restaurant.fontFamily || 'system-ui' }}>
+      {/* Header with cover image and logo */}
       <div className="relative h-[60vh] bg-black overflow-hidden">
-
-        {/* Image de couverture */}
+        {/* Cover image */}
         {restaurant.coverImage && (
           <div className="h-[60%] relative w-full">
             <Image
@@ -205,18 +223,15 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
           </div>
         )}
 
-        {/* Contenu principal */}
+        {/* Main content */}
         <div className="absolute inset-0 flex flex-col">
-          <div className="flex-1" /> {/* espace réservé pour l’image */}
-
-          {/* Card en bas avec glass effect */}
+          <div className="flex-1" /> {/* Spacer for image */}
           <div className="relative z-50 px-5 pb-8">
-            <div className="rounded-3xl bg-purple/40 backdrop-blur-xs border border-white/10 p-5 md:p-8 shadow-2xl">
-
-              {/* Logo + Nom */}
+            <div className="rounded-3xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xs border border-white/10 dark:border-gray-700 p-5 md:p-8 shadow-2xl">
+              {/* Logo + Name */}
               <div className="flex items-center gap-4 mb-6">
                 {restaurant.logo && (
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-white shadow-lg flex-shrink-0">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg flex-shrink-0">
                     <Image
                       src={urlFor(restaurant.logo).url()}
                       alt={`${restaurant.name} logo`}
@@ -226,36 +241,34 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
                     />
                   </div>
                 )}
-
                 <div className="flex-1">
                   <h1 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight">
                     {restaurant.name}
                   </h1>
-                  <div className="w-14 h-1 bg-red-500 rounded mt-1" />
+                  <div className="w-14 h-1 bg-orange-500 dark:bg-orange-600 rounded mt-1" />
                 </div>
               </div>
 
-              {/* Adresse */}
+              {/* Address */}
               {restaurant.adresse && (
                 <div className="flex items-center gap-2 mb-6 text-sm text-white/80">
-                  <MapPin className="w-4 h-4 text-red-400" />
+                  <MapPin className="w-4 h-4 text-orange-400 dark:text-orange-300" />
                   <span>{restaurant.adresse}</span>
                 </div>
               )}
 
-              {/* Actions principales */}
+              {/* Main actions */}
               <div className="space-y-3 mb-6">
                 {restaurant.whatsapp && (
                   <Link
                     href={`https://wa.me/${restaurant.whatsapp}`}
                     target="_blank"
-                    className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-medium text-white bg-green-500 hover:bg-green-600 active:scale-95 transition"
+                    className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-medium text-white bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 active:scale-95 transition"
                   >
                     <MessageCircle className="w-5 h-5" />
                     Contacter sur WhatsApp
                   </Link>
                 )}
-
                 {restaurant.phone && (
                   <Link
                     href={`tel:${restaurant.phone}`}
@@ -268,33 +281,31 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
                 )}
               </div>
 
-              {/* Réseaux sociaux */}
+              {/* Social media */}
               <div className="flex justify-center gap-4">
                 {restaurant.facebook && (
                   <Link
                     href={restaurant.facebook}
                     target="_blank"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-blue-500 hover:text-white text-blue-400 transition"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 dark:bg-gray-700/50 hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white text-blue-400 dark:text-blue-300 transition"
                   >
                     <Facebook className="w-5 h-5" />
                   </Link>
                 )}
-
                 {restaurant.instagram && (
                   <Link
                     href={restaurant.instagram}
                     target="_blank"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-pink-500 hover:text-white text-pink-400 transition"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 dark:bg-gray-700/50 hover:bg-pink-500 dark:hover:bg-pink-600 hover:text-white text-pink-400 dark:text-pink-300 transition"
                   >
                     <Instagram className="w-5 h-5" />
                   </Link>
                 )}
-
                 {restaurant.tiktok && (
                   <Link
                     href={restaurant.tiktok}
                     target="_blank"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-gray-800 hover:text-white text-white transition"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 dark:bg-gray-700/50 hover:bg-gray-800 dark:hover:bg-gray-900 hover:text-white text-white transition"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -310,63 +321,80 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
           </div>
         </div>
       </div>
+      <div className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 p-2 rounded-full shadow-md">
+        <ThemeToggle />
+      </div>
 
 
-      {/* 🔎 Barre recherche */}
-      <div className="bg-white border-b px-6 py-4">
+      {/* Search bar */}
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-6 py-4">
         <div className="relative max-w-lg mx-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
           <input
             type="text"
             placeholder="Rechercher dans le menu..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:bg-white transition"
+            className="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white dark:focus:bg-gray-600 transition"
             style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
           />
         </div>
       </div>
 
-      {/* 🟠 Barre catégories */}
-      <div className="sticky top-0 z-40 bg-white shadow-md">
+      {/* Categories bar */}
+      <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800">
         <div className="flex items-center justify-between px-4 pt-2">
-          <h2 className="text-base md:text-xl font-bold">Catégories</h2>
+          <h2 className="text-base md:text-xl font-bold text-gray-900 dark:text-white">Catégories</h2>
           <div className="flex gap-2">
-            <button onClick={() => scrollCategories('left')} className="p-2 rounded-full bg-gray-50 hover:bg-gray-100">
+            <button
+              onClick={() => scrollCategories('left')}
+              className="p-2 rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+            >
               <ChevronLeft className="w-3 h-3" />
             </button>
-            <button onClick={() => scrollCategories('right')} className="p-2 rounded-full bg-gray-50 hover:bg-gray-100">
+            <button
+              onClick={() => scrollCategories('right')}
+              className="p-2 rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+            >
               <ChevronRight className="w-3 h-3" />
             </button>
           </div>
         </div>
-        <div ref={categoryScrollerRef} className="flex gap-6 overflow-x-auto p-4 scrollbar-hide  ">
+        <div ref={categoryScrollerRef} className="flex gap-6 overflow-x-auto p-4 scrollbar-hide">
           {restaurant.categories.map(cat => (
             <button
               key={cat._id}
               onClick={() => handleCategoryClick(cat._id)}
-              ref={el => categoryRefs.current[cat._id] = el}
-              className={`flex flex-col items-center min-w-[100px] md:min-w-[120px] rounded-lg p-2 transition 
-                ${
-                selectedCategory === cat._id ? 'bg-orange-100 shadow-md scale-105' : 'bg-gray-100 hover:bg-gray-200'
+              ref={el => (categoryRefs.current[cat._id] = el)}
+              className={`flex flex-col items-center min-w-[100px] md:min-w-[120px] rounded-lg p-2 transition ${
+                selectedCategory === cat._id ? 'bg-orange-100 dark:bg-orange-900 shadow-md scale-105' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
               style={{
-          backgroundColor: selectedCategory === cat._id ? colors.primary + "20" : "#f3f4f6", // bg dynamique
-          boxShadow: selectedCategory === cat._id ? `0 2px 8px ${colors.primary}40` : undefined,
-          transform: selectedCategory === cat._id ? "scale(1.05)" : "scale(1)",
-        }}
+                backgroundColor: selectedCategory === cat._id ? colors.primary + '20' : undefined,
+                boxShadow: selectedCategory === cat._id ? `0 2px 8px ${colors.primary}40` : undefined,
+                transform: selectedCategory === cat._id ? 'scale(1.05)' : 'scale(1)',
+              }}
             >
               <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full overflow-hidden mb-2 shadow-md">
                 {cat.image ? (
-                 <Image src={urlFor(cat.image).url()} alt={cat.name} width={100} height={100} className="object-cover w-full h-full" />
+                  <Image
+                    src={urlFor(cat.image).url()}
+                    alt={cat.name}
+                    width={100}
+                    height={100}
+                    className="object-cover w-full h-full"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white" style={{ backgroundColor: colors.primary }}>
                     🍽️
                   </div>
                 )}
               </div>
-              <span className={`text-xs md:text-sm font-semibold ${selectedCategory === cat._id ? 'text-orange-600' : 'text-gray-700'}`}
-               >
+              <span
+                className={`text-xs md:text-sm font-semibold ${
+                  selectedCategory === cat._id ? 'text-orange-600 dark:text-orange-400' : 'text-gray-700 dark:text-gray-300'
+                }`}
+              >
                 {cat.name}
               </span>
             </button>
@@ -374,7 +402,7 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
         </div>
       </div>
 
-      {/* 🥘 Plats */}
+      {/* Dishes */}
       <div className="px-2 py-6 space-y-12">
         {filteredCategories.map(cat => (
           <div key={cat._id} data-category-id={cat._id} className="space-y-6">
@@ -388,7 +416,7 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
         ))}
       </div>
 
-      {/* 🔝 Remonter en haut */}
+      {/* Scroll to top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className="fixed bottom-6 right-6 text-white p-3 rounded-full shadow-2xl hover:scale-110 transition"
@@ -397,5 +425,5 @@ export const RestaurantPage: React.FC<RestaurantPageProps> = ({ restaurant }) =>
         <ArrowUp className="w-6 h-6" />
       </button>
     </div>
-  );
-};
+  )
+}

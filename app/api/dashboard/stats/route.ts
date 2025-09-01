@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { writeClient  } from '@/sanity/lib/write-client'
+import { writeClient } from '@/sanity/lib/write-client'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
@@ -11,11 +11,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user's restaurant
+    // Récupérer le restaurant de l'utilisateur
     const user = await writeClient.fetch(
-      `*[_type == "user" && email == $email][0]{
-        restaurant->{_id}
-      }`,
+      `*[_type == "user" && email == $email][0]{ restaurant->{_id} }`,
       { email: session.user.email }
     )
 
@@ -25,64 +23,48 @@ export async function GET() {
 
     const restaurantId = user.restaurant._id
 
-    // Fetch stats
-    const [
-      totalMenus,
-      totalDishes,
-      totalViews,
-      weeklyViews,
-      activeMenus,
-      availableDishes,
-      popularDishes,
-      dishes
+    // Récupérer stats
+    const [totalDishes, totalViews, weeklyViews, availableDishes, totalCategories, activeCategories
+
     ] = await Promise.all([
-      writeClient.fetch(`count(*[_type == "menu" && restaurant._ref == $restaurantId])`, { restaurantId }),
       writeClient.fetch(`count(*[_type == "dish" && restaurant._ref == $restaurantId])`, { restaurantId }),
       writeClient.fetch(`count(*[_type == "view" && restaurant._ref == $restaurantId])`, { restaurantId }),
       writeClient.fetch(`count(*[_type == "view" && restaurant._ref == $restaurantId && viewedAt >= $weekStart])`, {
         restaurantId,
         weekStart: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
       }),
-      writeClient.fetch(`count(*[_type == "menu" && restaurant._ref == $restaurantId && status == "active"])`, { restaurantId }),
       writeClient.fetch(`count(*[_type == "dish" && restaurant._ref == $restaurantId && isAvailable == true])`, { restaurantId }),
-      writeClient.fetch(`count(*[_type == "dish" && restaurant._ref == $restaurantId && isPopular == true])`, { restaurantId }),
-      writeClient.fetch(`*[_type == "dish" && restaurant._ref == $restaurantId && defined(price)]{price}`, { restaurantId })
+      writeClient.fetch(`count(*[_type == "category" && restaurant._ref == $restaurantId])`, { restaurantId }),
+      writeClient.fetch(`count(*[_type == "category" && restaurant._ref == $restaurantId && isActive == true])`, { restaurantId }),
     ])
 
-    // Calculate average price
-    const averagePrice = dishes.length > 0 
-      ? dishes.reduce((sum: number, dish: any) => sum + dish.price, 0) / dishes.length 
-      : 0
+    // Activité récente (plats et QR)
+    // dashboard/stats.ts
+        const recentActivity = await writeClient.fetch(`
+          *[_type == "view" && restaurant._ref == $restaurantId] | order(_createdAt desc)[0..10]{
+            _id,
+            _type,
+            _createdAt,
+          }
+        `, { restaurantId })
 
-    // Fetch recent activity
-    const recentActivity = await writeClient.fetch(`
-      *[_type == "view" && restaurant._ref == $restaurantId] | order(viewedAt desc)[0..10]{
-        _id,
-        viewType,
-        menu->{name},
-        dish->{name},
-        viewedAt
-      }
-    `, { restaurantId })
+      const formattedActivity = recentActivity.map((activity: any) => ({
+        _id: activity._id,
+        type: 'view',
+        action: 'a consulté votre menu',
+        itemName: activity.itemName,
+        createdAt: activity._createdAt
+      }))
 
-    const formattedActivity = recentActivity.map((activity: any) => ({
-      _id: activity._id,
-      type: activity.viewType,
-      action: `Vue ${activity.viewType}`,
-      itemName: activity[activity.viewType]?.name || 'Unknown',
-      createdAt: activity.viewedAt
-    }))
 
     return NextResponse.json({
       stats: {
-        totalMenus,
         totalDishes,
         totalViews,
         weeklyViews,
-        activeMenus,
         availableDishes,
-        popularDishes,
-        averagePrice
+        totalCategories,
+        activeCategories,
       },
       recentActivity: formattedActivity
     })

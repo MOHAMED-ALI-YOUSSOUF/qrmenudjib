@@ -1,63 +1,43 @@
-// sanity/schemas/view.ts
-import { defineField, defineType } from "sanity";
+// schemas/view.ts
+import { defineType, defineField } from 'sanity'
 
-export default defineType({
-  name: "view",
-  title: "Vue",
-  type: "document",
+export const view = defineType({
+  name: 'view',
+  title: 'View',
+  type: 'document',
   fields: [
     defineField({
-      name: "restaurant",
-      title: "Restaurant",
-      type: "reference",
-      to: [{ type: "restaurant" }],
-      validation: (Rule) => Rule.required(),
+      name: 'restaurant',
+      title: 'Restaurant',
+      type: 'reference',
+      to: [{ type: 'restaurant' }],
+      description: 'Le restaurant consulté'
     }),
     defineField({
-      name: "menu",
-      title: "Menu",
-      type: "reference",
-      to: [{ type: "menu" }],
+      name: 'visitorId',
+      title: 'Visitor ID',
+      type: 'string',
+      description: 'ID unique généré pour chaque visiteur (anonyme)',
     }),
     defineField({
-      name: "dish",
-      title: "Plat",
-      type: "reference",
-      to: [{ type: "dish" }],
+      name: 'viewedAt',
+      title: 'Date de vue',
+      type: 'datetime',
+      description: 'Date et heure de la consultation',
+      initialValue: () => new Date().toISOString()
     }),
     defineField({
-      name: "viewType",
-      title: "Type de vue",
-      type: "string",
+      name: 'type',
+      title: 'Type de vue',
+      type: 'string',
       options: {
         list: [
-          { title: "Menu", value: "menu" },
-          { title: "Plat", value: "dish" },
-          { title: "Restaurant", value: "restaurant" },
+          { title: 'Menu', value: 'menu' },
+          { title: 'Restaurant', value: 'restaurant' }
         ],
+        layout: 'radio'
       },
-      validation: (Rule) => Rule.required(),
+      initialValue: 'menu'
     }),
-    defineField({
-      name: "userAgent",
-      title: "User Agent",
-      type: "string",
-    }),
-    defineField({
-      name: "ipAddress",
-      title: "Adresse IP",
-      type: "string",
-    }),
-    defineField({
-      name: "sessionId",
-      title: "ID de session",
-      type: "string",
-    }),
-    defineField({
-      name: "viewedAt",
-      title: "Date de vue",
-      type: "datetime",
-      validation: (Rule) => Rule.required(),
-    }),
-  ],
-});
+  ]
+})
