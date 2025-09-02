@@ -12,13 +12,41 @@ import { Testimonials } from '@/components/landingPage/testimonials';
 import React from 'react';
 
 
+
+const previewItems = [
+  {
+    title: "Dashboard",
+    imageLight: "/images/dashboard-light.png",
+    imageDark: "/images/dashboard-dark.png",
+  },
+  {
+    title: "Plats",
+    imageLight: "/images/plats-light.png",
+    imageDark: "/images/plats-dark.png",
+  },
+  {
+    title: "QR Code",
+    imageLight: "/images/qrcode-light.png",
+    imageDark: "/images/qrcode-dark.png",
+  },
+  {
+    title: "Paramètres",
+    imageLight: "/images/settings-light.png",
+    imageDark: "/images/settings-dark.png",
+  },
+];
+
+
+
+
 const QRMenuLanding = () => {
   return (
     <div className="min-h-screen bg-background">
       <Nav />
       <Hero />
       <Features />
-      <DashboardPreview />
+      <DashboardPreview items={previewItems}/>
+
       <HowItWorks />
       <Testimonials />
       {/* <Pricing /> */}

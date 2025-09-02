@@ -56,38 +56,41 @@ const features = [
 
 export const Features = () => {
   return (
-   <section id="features" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge className="mb-4">Fonctionnalités</Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Fonctionnalités SaaS complètes
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tout ce dont vous avez besoin pour digitaliser votre restaurant et booster vos ventes
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 ">
-            {features.map((feature, index) => (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300 transform hover:scale-105 border-0 bg-white">
-                <CardHeader>
-                  <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <feature.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-         
+    <section id="features" className="py-20 bg-gray-50 dark:bg-gray-900 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 dark:bg-gray-800 dark:text-gray-200">Fonctionnalités</Badge>
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Fonctionnalités SaaS complètes
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Tout ce dont vous avez besoin pour digitaliser votre restaurant et booster vos ventes
+          </p>
         </div>
-      </section>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 ">
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className="group hover:shadow-lg transition-all duration-300 transform hover:scale-105 border-0 bg-white dark:bg-gray-800 dark:border-gray-700"
+            >
+              <CardHeader>
+                <div
+                  className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                >
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                <CardTitle className="text-xl dark:text-white">{feature.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {feature.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };

@@ -36,46 +36,52 @@ const routes = [
 
 interface SidebarProps {
   className?: string;
+  onItemClick?: () => void; // Pour fermer le Sheet mobile
+  forceExpanded?: boolean; // Force l'expansion (pour le Sheet mobile)
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className, onItemClick, forceExpanded = false }: SidebarProps) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Fermer sidebar automatiquement quand le pathname change (sur petit écran)
+  // Auto-collapse sur petits écrans (seulement si pas forcé en mode expanded)
   useEffect(() => {
-    if (window.innerWidth < 768) {
-      setIsCollapsed(true);
+    if (!forceExpanded) {
+      const handleResize = () => {
+        if (window.innerWidth < 768) {
+          setIsCollapsed(true);
+        }
+      };
+      
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
     }
-  }, [pathname]);
-
-  // Sur resize → collapse si petit écran
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsCollapsed(true);
-      }
-    };
-    handleResize(); // init au montage
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [forceExpanded]);
 
   const handleSignOut = async () => {
     try {
       await signOut({ callbackUrl: "/auth/signin" });
-      
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
     }
   };
+
+  const handleLinkClick = () => {
+    if (onItemClick) {
+      onItemClick();
+    }
+  };
+
+  // Détermine si la sidebar doit être collapsed
+  const shouldBeCollapsed = forceExpanded ? false : isCollapsed;
 
   return (
     <TooltipProvider>
       <div
         className={cn(
           "flex flex-col h-full bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
-          isCollapsed ? "w-16" : "w-64",
+          shouldBeCollapsed ? "w-16" : "w-64",
           className
         )}
       >
@@ -84,7 +90,7 @@ export function Sidebar({ className }: SidebarProps) {
           <div
             className={cn(
               "flex items-center transition-opacity duration-300",
-              isCollapsed && "opacity-0 w-0 overflow-hidden"
+              shouldBeCollapsed && "opacity-0 w-0 overflow-hidden"
             )}
           >
             <ChefHat className="h-8 w-8 text-orange-500" />
@@ -92,19 +98,20 @@ export function Sidebar({ className }: SidebarProps) {
               {APP_NAME}
             </h2>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 p-0 hidden md:flex cursor-pointer"
-          >
-            {isCollapsed ? (
-            
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
+          {!forceExpanded && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="h-8 w-8 p-0 hidden md:flex cursor-pointer"
+            >
+              {shouldBeCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Navigation */}
@@ -116,16 +123,17 @@ export function Sidebar({ className }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "cursor-pointer w-full h-11 lg:h-12 text-sm lg:text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800  ",
+                    "cursor-pointer w-full h-11 lg:h-12 text-sm lg:text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800",
                     isActive &&
                       "bg-orange-50 text-orange-700 hover:bg-orange-50 hover:text-orange-700 dark:bg-orange-950 dark:text-orange-400 dark:hover:bg-orange-950",
-                    isCollapsed ? "justify-center px-2" : "justify-start px-3 lg:px-4"
+                    shouldBeCollapsed ? "justify-center px-2" : "justify-start px-3 lg:px-4"
                   )}
+                  onClick={handleLinkClick}
                 >
                   <Icon
-                    className={cn("h-5 w-5 flex-shrink-0", !isCollapsed && "mr-3")}
+                    className={cn("h-5 w-5 flex-shrink-0", !shouldBeCollapsed && "mr-3")}
                   />
-                  {!isCollapsed && (
+                  {!shouldBeCollapsed && (
                     <span className="truncate transition-all duration-300">
                       {label}
                     </span>
@@ -133,12 +141,12 @@ export function Sidebar({ className }: SidebarProps) {
                 </Button>
               );
 
-              return isCollapsed ? (
+              return shouldBeCollapsed ? (
                 <Tooltip key={href}>
                   <TooltipTrigger asChild>
                     <Link href={href}>{button}</Link>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="font-medium ">
+                  <TooltipContent side="right" className="font-medium">
                     {label}
                   </TooltipContent>
                 </Tooltip>
@@ -152,8 +160,8 @@ export function Sidebar({ className }: SidebarProps) {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800 ">
-          {isCollapsed ? (
+        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800">
+          {shouldBeCollapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

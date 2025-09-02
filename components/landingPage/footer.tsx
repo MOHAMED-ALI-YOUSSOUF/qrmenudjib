@@ -22,7 +22,7 @@ export const Footer = () => {
           </div>
 
           {/* Description */}
-          <p className="text-gray-400 mb-6 max-w-md">
+          <p className="text-gray-400 mb-6 ">
             La solution complète pour digitaliser vos menus et booster vos
             ventes. Conçu spécialement pour les restaurants à Djibouti. Nous aidons les restaurateurs à moderniser leur service
             tout en respectant les traditions locales.

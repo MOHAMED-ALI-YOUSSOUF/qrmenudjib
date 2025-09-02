@@ -16,6 +16,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Desktop Sidebar */}
@@ -25,9 +29,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Mobile Sidebar */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-         <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
         <SheetContent side="left" className="p-0 w-64">
-          <Sidebar />
+          <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
+          <Sidebar onItemClick={closeMobileMenu} forceExpanded={true} />
         </SheetContent>
       </Sheet>
 

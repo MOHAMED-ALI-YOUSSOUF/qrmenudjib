@@ -5,19 +5,23 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+
 ) {
   const session = await getServerSession(authOptions);
 
   // Vérifier que l'utilisateur est bien connecté et qu'il consulte son propre compte
-  if (!session || !session.user || session.user.id !== params.id) {
-    return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { success: false, error: "Utilisateur non authentifié" },
+      { status: 401 }
+    );
   }
+
 
   try {
     const userData = await writeClient.fetch(
-      `*[_type == "user" && _id == $id][0] { name, email }`,
-      { id: params.id }
+      `*[_type == "user" && email == $email][0] { name, email }`,
+      { email: session.user.email }
     );
 
     if (!userData) {

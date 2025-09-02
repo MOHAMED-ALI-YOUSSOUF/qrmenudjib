@@ -12,14 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Settings, LogOut, Bell } from "lucide-react";
+import { User, Settings, LogOut, Bell, Menu } from "lucide-react";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { ThemeToggle } from "../theme-toggle";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  onMobileMenuToggle?: () => void;
+  isMobileMenuOpen?: boolean;
+}
+
+export function DashboardHeader({ onMobileMenuToggle, isMobileMenuOpen }: DashboardHeaderProps) {
   const { data: session } = useSession();
   const { data: userData, mutate } = useSWR(
     session?.user?.id ? `/api/user/${session.user.id}` : null,
@@ -31,25 +36,43 @@ export function DashboardHeader() {
   const handleSignOut = async () => signOut({ callbackUrl: "/auth/signin" });
 
   return (
-    <header className="flex justify-end items-center p-4 border-b bg-white dark:bg-gray-950">
-      <div className="flex items-center space-x-2">
+    <header className="flex justify-between items-center p-4 border-b bg-white dark:bg-gray-950">
+      {/* Mobile menu button */}
+      <div className="flex items-center md:hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onMobileMenuToggle}
+          className="h-10 w-10 p-0"
+        >
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Ouvrir le menu</span>
+        </Button>
+      </div>
 
+      {/* Right side actions */}
+      <div className="flex items-center space-x-2 ml-auto">
         <ThemeToggle/>
+        
         {/* Notifications */}
-         <TooltipProvider> 
+        <TooltipProvider> 
           <Tooltip> 
             <TooltipTrigger asChild> 
-              <Button variant="ghost" size="sm" className="relative h-9 w-9" > 
+              <Button variant="ghost" size="sm" className="relative h-9 w-9"> 
                 <Bell className="h-4 w-4" /> 
-                {notifications > 0 && ( <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 min-w-5" > {notifications > 9 ? "9+" : notifications} </Badge> )} 
+                {notifications > 0 && ( 
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 min-w-5"> 
+                    {notifications > 9 ? "9+" : notifications} 
+                  </Badge> 
+                )} 
                 <span className="sr-only">Notifications</span> 
-                </Button> 
-                </TooltipTrigger> 
-                <TooltipContent side="bottom"> 
-                  <p>Notifications (à implémenter)</p> </TooltipContent> 
-                  </Tooltip> 
-                  </TooltipProvider>
-        
+              </Button> 
+            </TooltipTrigger> 
+            <TooltipContent side="bottom"> 
+              <p>Notifications (à implémenter)</p> 
+            </TooltipContent> 
+          </Tooltip> 
+        </TooltipProvider>
 
         {/* User menu */}
         <DropdownMenu>

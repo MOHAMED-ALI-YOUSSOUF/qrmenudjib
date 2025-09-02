@@ -103,7 +103,7 @@ export default function DashboardPage() {
               Voici un aperçu de votre restaurant aujourd&apos;hui.
             </p>
           </div>
-          <div className="mt-4 sm:mt-0 text-right">
+          <div className="mt-4 sm:mt-0 text-right flex items-center space-x-2 sm:flex-col">
             <p className="text-sm text-gray-500 dark:text-gray-400">Aujourd&apos;hui</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {new Date().toLocaleDateString('fr-FR', {
@@ -145,7 +145,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions and Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-8">
         <div className="lg:col-span-2">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
