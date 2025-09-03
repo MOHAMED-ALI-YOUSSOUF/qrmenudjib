@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { BookOpen, UtensilsCrossed, QrCode, Plus, ArrowUpRight, Calendar, Clock, Eye } from 'lucide-react'
+import { BookOpen, UtensilsCrossed, QrCode, Plus, Eye } from 'lucide-react'
 import StatsCard from '@/components/dashboard/dashboard/StatsCard'
 import QuickActionCard from '@/components/dashboard/dashboard/QuickActionCard'
 import RecentActivityList from '@/components/dashboard/dashboard/RecentActivityList'

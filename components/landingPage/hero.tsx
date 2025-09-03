@@ -6,8 +6,8 @@ import { Card } from '@/components/ui/card';
 import { QrCode, Smartphone, TrendingUp, ArrowRight, Headphones } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { APP_NAME } from '@/lib/constants';
-import QRGenerator from '../shared/qr-generator';
+import { APP_LINK, APP_NAME } from '@/lib/constants';
+import QRGenerator from './qr-generator'
 
 export const Hero = () => {
   return (
@@ -127,7 +127,7 @@ export const Hero = () => {
                     Scannez pour découvrir le menu
                   </p>
                   <QRGenerator
-                    value={`https://${APP_NAME}.rohaty.com/demo`}
+                    value={`https://${APP_LINK}/demo`}
                     size={160}
                     className="mb-4"
                     logoUrl="/demo.png"

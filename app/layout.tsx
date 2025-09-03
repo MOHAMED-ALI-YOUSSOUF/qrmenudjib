@@ -10,22 +10,22 @@ import CustomSessionProvider from '@/components/SessionProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'QRMenu.dj - Menu QR Code pour Restaurants',
+  title: 'QRMenu - Menu QR Code pour Restaurants',
   description: 'Plateforme SaaS permettant aux restaurants de Djibouti de gérer et afficher leur menu via QR Code',
   keywords: ['restaurant', 'menu', 'QR code', 'Djibouti', 'SaaS'],
-  authors: [{ name: 'QRMenu.dj' }],
-  creator: 'QRMenu.dj',
+  authors: [{ name: 'Mohamed Ali Youssouf' }],
+  creator: 'mohamed-ali-youssouf.com',
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://qrmenu.dj',
-    title: 'QRMenu.dj - Menu QR Code pour Restaurants',
+    url: 'https://qrmenu.rohaty.com',
+    title: 'QRMenu - Menu QR Code pour Restaurants',
     description: 'Plateforme SaaS permettant aux restaurants de Djibouti de gérer et afficher leur menu via QR Code',
     siteName: 'QRMenu.dj',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'QRMenu.dj - Menu QR Code pour Restaurants',
+    title: 'QRMenu - Menu QR Code pour Restaurants',
     description: 'Plateforme SaaS permettant aux restaurants de Djibouti de gérer et afficher leur menu via QR Code',
   },
 };
