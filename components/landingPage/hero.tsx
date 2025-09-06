@@ -133,7 +133,7 @@ export const Hero = () => {
                     logoUrl="/demo.png"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 font-medium underline underline-offset-2 lowercase text-center">
-                    https://{APP_NAME}/demo
+                    https://{APP_LINK}/demo
                   </p>
 
                   {/* Menu categories */}

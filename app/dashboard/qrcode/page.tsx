@@ -70,7 +70,7 @@ export default function QRCodePage() {
             setRestaurant(restaurantData);
             
             // Set default URL based on restaurant slug
-            const defaultUrl = `https://${APP_LINK}.rohaty.com/${restaurantData.slug.current}`;
+            const defaultUrl = `https://${APP_LINK}/${restaurantData.slug.current}`;
             
             // Try to fetch existing QR code settings
             try {

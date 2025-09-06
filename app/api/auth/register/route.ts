@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { writeClient } from '@/sanity/lib/write-client'
-
+import { sendEmail } from "@/lib/email";
 
 
 export async function POST(request: NextRequest) {
@@ -167,6 +167,13 @@ let slug = baseSlug;
 
     console.log('✅ Restaurant créé:', newRestaurant._id)
 
+    // Patch user pour ajouter le restaurant
+    await writeClient.patch(newUser._id)
+    .set({
+      restaurant: { _type: 'reference', _ref: newRestaurant._id }
+    })
+    .commit()
+
     // Réponse de succès
     const response = {
       message: 'Compte créé avec succès. Votre restaurant est en attente de validation.',
@@ -182,6 +189,31 @@ let slug = baseSlug;
         status: newRestaurant.status
       }
     }
+
+    // Email au restaurateur
+    await sendEmail(
+      email,
+      "Votre inscription sur QRMenu",
+      `
+      <h2>Bienvenue ${name} 👋</h2>
+      <p>Votre restaurant <strong>${restaurantName}</strong> a bien été enregistré.</p>
+      <p>Il est actuellement <b>en attente de validation</b>.</p>
+      <p>Vous recevrez un email dès qu'il sera activé ✅.</p>
+      `
+    );
+
+    // Email pour toi (admin)
+    await sendEmail(
+      "admin@qrmenu.rohaty.com",
+      "📥 Nouvelle inscription restaurant",
+      `
+      <h2>Nouveau restaurateur inscrit</h2>
+      <p>Nom: ${name}</p>
+      <p>Email: ${email}</p>
+      <p>Restaurant: ${restaurantName}</p>
+      <p>Status: pending</p>
+      `
+    );
 
     console.log('🎉 Inscription terminée avec succès')
     return NextResponse.json(response, { status: 201 })
