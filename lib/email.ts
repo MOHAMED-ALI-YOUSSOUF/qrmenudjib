@@ -14,4 +14,5 @@ export async function sendEmail(to: string, subject: string, html: string) {
   } catch (error) {
     console.error("❌ Erreur envoi email:", error);
   }
+  
 }
